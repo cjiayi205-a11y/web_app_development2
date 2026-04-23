@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">財務總覽</h2>
+    <form class="d-flex" method="GET" action="{{ url_for('main.index') }}">
+        <input type="month" name="month" class="form-control form-control-glass me-2" value="{{ month }}" onchange="this.form.submit()">
+    </form>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100 text-center">
+            <h6 class="text-muted text-uppercase mb-2">本月結餘</h6>
+            <h2 class="fw-bold {% if balance >= 0 %}text-success-custom{% else %}text-danger-custom{% endif %}">
+                ${{ "{:,.0f}".format(balance) }}
+            </h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100 text-center">
+            <h6 class="text-muted text-uppercase mb-2">本月總收入</h6>
+            <h3 class="fw-bold text-success-custom">${{ "{:,.0f}".format(total_income) }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100 text-center">
+            <h6 class="text-muted text-uppercase mb-2">本月總支出</h6>
+            <h3 class="fw-bold text-danger-custom">${{ "{:,.0f}".format(total_expense) }}</h3>
+            {% if budget_amount > 0 %}
+                {% set percent = (total_expense / budget_amount * 100) | round %}
+                <div class="progress mt-3" style="height: 10px; background-color: rgba(255,255,255,0.1);">
+                    <div class="progress-bar {% if percent > 90 %}bg-danger{% elif percent > 75 %}bg-warning{% else %}bg-success{% endif %}" 
+                         role="progressbar" style="width: {{ percent }}%;"></div>
+                </div>
+                <small class="text-muted mt-1 d-block">預算 ${{ "{:,.0f}".format(budget_amount) }} ({{ percent }}%)</small>
+            {% else %}
+                <small class="text-muted mt-1 d-block">尚未設定預算</small>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="glass-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">近期紀錄</h5>
+        <a href="{{ url_for('expense.list_expenses') }}" class="btn btn-sm btn-outline-light">查看全部</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-dark table-hover table-borderless text-white mb-0" style="background: transparent;">
+            <thead>
+                <tr class="border-bottom border-secondary">
+                    <th>日期</th>
+                    <th>分類</th>
+                    <th>備註</th>
+                    <th class="text-end">金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.record_date }}</td>
+                    <td>
+                        <span class="badge {% if expense.category_type == 'income' %}bg-success{% else %}bg-danger{% endif %} bg-opacity-25 border border-{% if expense.category_type == 'income' %}success{% else %}danger{% endif %} rounded-pill">
+                            {{ expense.category_name }}
+                        </span>
+                    </td>
+                    <td class="text-muted">{{ expense.note }}</td>
+                    <td class="text-end fw-bold {% if expense.category_type == 'income' %}text-success-custom{% else %}text-danger-custom{% endif %}">
+                        {% if expense.category_type == 'income' %}+{% else %}-{% endif %}${{ "{:,.0f}".format(expense.amount) }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">目前沒有任何紀錄。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

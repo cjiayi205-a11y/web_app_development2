@@ -1,0 +1,80 @@
+:root {
+  --primary-color: #4F46E5;
+  --primary-hover: #4338CA;
+  --success-color: #10B981;
+  --danger-color: #EF4444;
+  --bg-gradient-start: #1e1e2f;
+  --bg-gradient-end: #12121a;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+}
+
+body {
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-glass {
+  background: rgba(18, 18, 26, 0.8) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.btn-custom {
+  background: linear-gradient(45deg, var(--primary-color), #818cf8);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+  background: linear-gradient(45deg, var(--primary-hover), #6366f1);
+  color: white;
+  transform: scale(1.05);
+}
+
+.form-control-glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+}
+
+.form-control-glass:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-color);
+  color: var(--text-main);
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+}
+
+.form-select-glass {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+}
+
+.form-select-glass option {
+  background: var(--bg-gradient-start);
+  color: var(--text-main);
+}
+
+.text-success-custom { color: var(--success-color) !important; }
+.text-danger-custom { color: var(--danger-color) !important; }

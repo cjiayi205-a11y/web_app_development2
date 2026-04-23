@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="glass-card p-5">
+            <h3 class="fw-bold mb-4 text-center">新增收支紀錄</h3>
+            <form method="POST" action="{{ url_for('expense.create_expense') }}">
+                <div class="mb-3">
+                    <label class="form-label text-muted">類型與分類</label>
+                    <select name="category_id" class="form-select form-select-glass" required>
+                        <option value="" disabled selected>請選擇分類...</option>
+                        <optgroup label="支出 (Expense)">
+                            {% for c in categories if c.type == 'expense' %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="收入 (Income)">
+                            {% for c in categories if c.type == 'income' %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-muted">金額</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-secondary text-white">$</span>
+                        <input type="number" step="0.01" name="amount" class="form-control form-control-glass" required placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted">日期</label>
+                    <input type="date" name="record_date" class="form-control form-control-glass" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-muted">備註 (選填)</label>
+                    <input type="text" name="note" class="form-control form-control-glass" placeholder="輸入備註事項...">
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-custom py-2 fw-bold">儲存紀錄</button>
+                    <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary py-2">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 自動填入今日日期
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.querySelector('input[name="record_date"]');
+        if (!dateInput.value) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    });
+</script>
+{% endblock %}

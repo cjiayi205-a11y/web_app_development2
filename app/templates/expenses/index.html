@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">收支明細</h2>
+    <div class="d-flex gap-2">
+        <form method="GET" action="{{ url_for('expense.list_expenses') }}">
+            <input type="month" name="month" class="form-control form-control-glass" value="{{ current_month }}" onchange="this.form.submit()">
+        </form>
+        <a href="{{ url_for('expense.new_expense') }}" class="btn btn-custom"><i class="bi bi-plus-lg"></i> 新增</a>
+    </div>
+</div>
+
+<div class="glass-card p-4">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover table-borderless align-middle mb-0" style="background: transparent;">
+            <thead>
+                <tr class="border-bottom border-secondary">
+                    <th>日期</th>
+                    <th>分類</th>
+                    <th>備註</th>
+                    <th class="text-end">金額</th>
+                    <th class="text-end">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.record_date }}</td>
+                    <td>
+                        <span class="badge {% if expense.category_type == 'income' %}bg-success{% else %}bg-danger{% endif %} bg-opacity-25 border border-{% if expense.category_type == 'income' %}success{% else %}danger{% endif %} rounded-pill">
+                            {{ expense.category_name }}
+                        </span>
+                    </td>
+                    <td class="text-muted">{{ expense.note }}</td>
+                    <td class="text-end fw-bold {% if expense.category_type == 'income' %}text-success-custom{% else %}text-danger-custom{% endif %}">
+                        {% if expense.category_type == 'income' %}+{% else %}-{% endif %}${{ "{:,.0f}".format(expense.amount) }}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group">
+                            <a href="{{ url_for('expense.edit_expense', id=expense.id) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-pencil"></i></a>
+                            <form method="POST" action="{{ url_for('expense.delete_expense', id=expense.id) }}" class="d-inline" onsubmit="return confirm('確定要刪除這筆紀錄嗎？');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">這個月沒有任何紀錄。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

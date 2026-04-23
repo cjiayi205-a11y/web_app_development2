@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">報表分析與預算</h2>
+    <form method="GET" action="{{ url_for('report.view_report') }}" class="d-flex">
+        <input type="month" name="month" class="form-control form-control-glass" value="{{ month }}" onchange="this.form.submit()">
+    </form>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="glass-card p-4 h-100">
+            <h5 class="fw-bold mb-4">當月支出分類比例</h5>
+            {% if values %}
+            <div style="position: relative; height:400px; width:100%">
+                <canvas id="expenseChart"></canvas>
+            </div>
+            {% else %}
+            <div class="d-flex h-100 justify-content-center align-items-center">
+                <p class="text-muted mb-0">本月份沒有任何支出紀錄，無法產生圖表。</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="glass-card p-4">
+            <h5 class="fw-bold mb-4">設定每月預算</h5>
+            <form method="POST" action="{{ url_for('report.set_budget') }}">
+                <div class="mb-3">
+                    <label class="form-label text-muted">套用月份</label>
+                    <input type="month" name="month" class="form-control form-control-glass" value="{{ month }}" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted">總預算金額</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-secondary text-white">$</span>
+                        <input type="number" step="0.01" name="amount" class="form-control form-control-glass" required placeholder="例如：20000">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-custom w-100 fw-bold">設定預算</button>
+            </form>
+            <div class="mt-4 p-3 rounded" style="background: rgba(255,255,255,0.05);">
+                <i class="bi bi-info-circle text-info me-2"></i>
+                <small class="text-muted">設定預算後，您可以在首頁總覽中追蹤當月的預算使用進度。</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if values %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('expenseChart').getContext('2d');
+        
+        // 解析後端傳來的資料
+        const labels = {{ labels | tojson }};
+        const values = {{ values | tojson }};
+        
+        // 產生好看的漸層色盤
+        const colors = [
+            '#4F46E5', '#10B981', '#F59E0B', '#EF4444', 
+            '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'
+        ];
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: '#f3f4f6',
+                            padding: 20,
+                            font: { family: "'Inter', sans-serif", size: 14 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(18, 18, 26, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}
